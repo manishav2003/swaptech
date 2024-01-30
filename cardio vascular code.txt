@@ -1,0 +1,442 @@
+cardio vascular
+
+*Training.py*
+
+ # Importing the libraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import tensorflow.keras as tf
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn import model_selection
+from sklearn.naive_bayes import GaussianNB
+from sklearn import svm
+from sklearn import tree
+from sklearn.ensemble import VotingClassifier
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import cohen_kappa_score
+import sklearn
+import scikitplot as skplt
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pickle
+
+
+# Importing the dataset
+dataset = pd.read_csv('heart.csv')
+dataset=dataset.dropna(how="any")
+print(dataset)
+
+print(dataset.info())
+
+#Data Visualization
+
+#age vs cholestrol
+m = dataset['age']
+n = dataset['chol']
+plt.figure(figsize=(4,4))
+plt.title("Bar plot graph",fontsize=20)
+plt.xlabel("Age",fontsize=15)
+plt.ylabel("Cholestrol",fontsize=15)
+plt.bar(m,n,label="bar plot",color=["orange"],width=0.5)
+plt.legend(loc='best')
+plt.show()
+
+#age vs chest pain
+m = dataset['age']
+n = dataset['cp']
+plt.figure(figsize=(4,4))
+plt.title("Bar plot graph",fontsize=20)
+plt.xlabel("Age",fontsize=15)
+plt.ylabel("Cp",fontsize=15)
+plt.bar(m,n,label="bar plot",color=["orange"],width=0.5)
+plt.legend(loc='best')
+plt.show()
+
+
+
+X = dataset.iloc[:,:-1].values
+y = dataset.iloc[:, 13].values
+
+# Splitting the dataset into the Training set and Test set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 121)#101
+
+#Random Forest training
+print("RF training")
+
+# Fitting RF to the Training set
+from sklearn.ensemble import RandomForestClassifier
+model1 = RandomForestClassifier(max_depth=5, random_state=1)
+model1.fit(X_train, y_train)
+#import pickle
+#knnPickle = open('knnpickle_file', 'wb')
+#pickle.dump(classifier, knnPickle)                      
+#print("Training Completed")
+# load the model from disk
+
+y_pred = model1.predict(X_test)
+print("ypred of Random Forest Classifer ")
+print(y_pred)
+
+
+#confussion Matrix
+cm = confusion_matrix(y_test, y_pred)
+print("Confussion Matrix for RF")
+print(cm)
+
+
+cm_df = pd.DataFrame(cm,
+                     index = ['normal','CVD'], 
+                     columns = ['normal','CVD'])
+#Plotting the confusion matrix
+plt.figure(figsize=(5,4))
+sns.heatmap(cm_df, annot=True)
+plt.title('Confusion Matrix of Random Forest')
+plt.show()
+
+fpr1, tpr1, _ = sklearn.metrics.roc_curve(y_test, y_pred)
+auc_score1 = sklearn.metrics.auc(fpr1, tpr1)
+
+rf = accuracy_score(y_test, y_pred)
+
+print("RF accuracy is ")
+print(rf)
+print("")
+
+
+testy = y_test
+yhat_classes = y_pred
+precision = precision_score(testy, yhat_classes)
+print('Precision: %f' % precision)
+recall = recall_score(testy, yhat_classes)
+print('Recall: %f' % recall)
+f1 = f1_score(testy, yhat_classes)
+print('F1 score: %f' % f1)
+ 
+# kappa
+kappa = cohen_kappa_score(testy, yhat_classes)
+print('Cohens kappa: %f' % kappa)
+
+
+#KNN training
+print("KNN training")
+
+# Fitting KNN to the Training set
+from sklearn.neighbors import KNeighborsClassifier
+model2 = KNeighborsClassifier(n_neighbors=1)
+model2.fit(X_train, y_train)
+#import pickle
+#knnPickle = open('knnpickle_file', 'wb')
+#pickle.dump(classifier, knnPickle)                      
+#print("Training Completed")
+# load the model from disk
+
+y_pred = model2.predict(X_test)
+print("ypred of KNN ")
+print(y_pred)
+
+
+#confussion Matrix
+cm = confusion_matrix(y_test, y_pred)
+print("Confussion Matrix for KNN")
+print(cm)
+
+cm_df = pd.DataFrame(cm,
+                     index = ['normal','CVD'], 
+                     columns = ['normal','CVD'])
+#Plotting the confusion matrix
+plt.figure(figsize=(5,4))
+sns.heatmap(cm_df, annot=True)
+plt.title('Confusion Matrix of KNN')
+plt.show()
+
+fpr2, tpr2, _ = sklearn.metrics.roc_curve(y_test, y_pred)
+auc_score2 = sklearn.metrics.auc(fpr2, tpr2)
+
+knn = accuracy_score(y_test, y_pred)
+
+print("KNN accuracy is ")
+print(knn)
+print("")
+
+
+testy = y_test
+yhat_classes = y_pred
+precision = precision_score(testy, yhat_classes)
+print('Precision: %f' % precision)
+recall = recall_score(testy, yhat_classes)
+print('Recall: %f' % recall)
+f1 = f1_score(testy, yhat_classes)
+print('F1 score: %f' % f1)
+ 
+# kappa
+kappa = cohen_kappa_score(testy, yhat_classes)
+print('Cohens kappa: %f' % kappa)
+
+
+#svm training
+print("svm training")
+model3 =svm.SVC()
+model3.fit(X_train, y_train)
+y_pred = model3.predict(X_test)
+print("ypred of SVM ")
+print(y_pred)
+
+
+#confussion Matrix
+cm = confusion_matrix(y_test, y_pred)
+print("Confussion Matrix for SVM")
+print(cm)
+cm_df = pd.DataFrame(cm,
+                     index = ['normal','CVD'], 
+                     columns = ['normal','CVD'])
+#Plotting the confusion matrix
+plt.figure(figsize=(5,4))
+sns.heatmap(cm_df, annot=True)
+plt.title('Confusion Matrix of SVM')
+plt.show()
+
+fpr3, tpr3, _ = sklearn.metrics.roc_curve(y_test, y_pred)
+auc_score3 = sklearn.metrics.auc(fpr3, tpr3)
+
+svma = accuracy_score(y_test, y_pred)
+
+print("SVM accuracy is ")
+print(svma)
+print("")
+
+
+testy = y_test
+yhat_classes = y_pred
+precision = precision_score(testy, yhat_classes)
+print('Precision: %f' % precision)
+recall = recall_score(testy, yhat_classes)
+print('Recall: %f' % recall)
+f1 = f1_score(testy, yhat_classes)
+print('F1 score: %f' % f1)
+ 
+# kappa
+kappa = cohen_kappa_score(testy, yhat_classes)
+print('Cohens kappa: %f' % kappa)
+
+
+#naive bayes training
+print("naive bayes training")
+model4 =GaussianNB()
+history = model4.fit(X_train, y_train)
+
+nbPickle = open('nbpickle_file', 'wb')
+pickle.dump(model4, nbPickle)
+nbPickle.close()
+y_pred = model4.predict(X_test)
+print("ypred of naive bayes ")
+print(y_pred)
+
+
+#confussion Matrix
+cm = confusion_matrix(y_test, y_pred)
+print("Confussion Matrix for naive bayes")
+print(cm)
+cm_df = pd.DataFrame(cm,
+                     index = ['normal','CVD'], 
+                     columns = ['normal','CVD'])
+#Plotting the confusion matrix
+plt.figure(figsize=(5,4))
+sns.heatmap(cm_df, annot=True)
+plt.title('Confusion Matrix of Naive Bayes')
+plt.show()
+
+fpr4, tpr4, _ = sklearn.metrics.roc_curve(y_test, y_pred)
+auc_score4 = sklearn.metrics.auc(fpr4, tpr4)
+
+nb = accuracy_score(y_test, y_pred)
+
+print("naive bayes accuracy is ")
+print(nb)
+print("")
+
+testy = y_test
+yhat_classes = y_pred
+precision = precision_score(testy, yhat_classes)
+print('Precision: %f' % precision)
+recall = recall_score(testy, yhat_classes)
+print('Recall: %f' % recall)
+f1 = f1_score(testy, yhat_classes)
+print('F1 score: %f' % f1)
+ 
+# kappa
+kappa = cohen_kappa_score(testy, yhat_classes)
+print('Cohens kappa: %f' % kappa)
+
+
+
+plt.figure(figsize=(7, 6))
+plt.plot(fpr1, tpr1, color='blue',
+label='ROC (RF AUC = %0.4f)' % auc_score1)
+plt.plot(fpr2, tpr2, color='red',
+label='ROC (KNN AUC = %0.4f)' % auc_score2)
+plt.plot(fpr3, tpr3, color='orange',
+label='ROC (SVM AUC = %0.4f)' % auc_score3)
+plt.plot(fpr4, tpr4, color='green',
+label='ROC (NB AUC = %0.4f)' % auc_score4)
+plt.legend(loc='lower right')
+plt.title("ROC Curve")
+plt.xlabel("FPR")
+plt.ylabel("TPR")
+plt.show()
+
+
+data = {'RF':rf, 'KNN':knn, 'SVM':svma, 'NB':nb}
+courses = list(data.keys())
+values = list(data.values())
+  
+fig = plt.figure(figsize = (10, 5))
+ 
+# creating the bar plot
+plt.bar(courses, values, color ='maroon',
+        width = 0.4)
+ 
+plt.xlabel("ML Algorithms")
+plt.ylabel("Accuracy")
+plt.title("Performance")
+plt.show()
+print("")
+flg=0;
+if((rf>knn)and(rf>svma)and(rf>nb)):
+    print("Random Forest is the best")
+elif((knn>rf)and(knn>svma)and(knn>nb)):
+    print("KNN is best")
+elif((svma>rf)and(svma>knn)and(svma>nb)):
+    print("SVM is best")
+elif((nb>rf)and(nb>knn)and(nb>svma)):
+    print("Naive Bayes is best")
+    
+print("Training Completed")
+
+*Testing.py*
+
+import numpy as np
+
+import tensorflow.keras as tf
+from tensorflow.keras.layers import *
+from tensorflow.keras.models import * 
+from tensorflow.keras.preprocessing import image
+import pandas as pd
+import pickle
+
+import click
+from PIL import Image
+
+from time import sleep
+#RSA
+
+# STEP 1: Generate Two Large Prime Numbers (p,q) randomly
+from random import randrange, getrandbits
+from tkinter import *
+from tkinter import ttk  
+from tkinter import Menu  
+from tkinter import messagebox as mbox  
+# import filedialog module
+from tkinter import filedialog
+flg=0;
+import tkinter as tk
+
+# Function for opening the
+# file explorer window
+def browseFiles():
+    filename = filedialog.askopenfilename(initialdir = "/",
+                                          title = "Select a CSV File",
+                                          filetypes = (("CSV files",
+                                                        "*.csv*"),
+                                                       ("all files",
+                                                        "*.*")))
+    # Change label contents
+    label_file_explorer.configure(text="File Opened: "+filename)
+    global f
+    f = filename
+
+
+def start():
+
+    print("Process Started")
+    dataset = pd.read_csv(f)
+    dataset=dataset.dropna(how="any")
+    print(dataset)
+
+    print(dataset.info())
+
+    X = dataset.iloc[:,:].values
+
+    # load the model from disk
+    model = pickle.load(open('nbpickle_file', 'rb'))
+    ypred = model.predict(X)
+    ypred = ypred.round()
+    print(ypred)
+    app = tk.Tk()
+    if(ypred[0]==0):
+        print("Normal")
+        label_file_explorer.configure(text="Result for the patient data: The Input data is Normal")
+        app.title("Cardio Vascular Disease Prediction system")
+        ttk.Label(app, text="Result for the patient data: The Input data is Normal").grid(column=0,row=0,padx=20,pady=30)  
+        menuBar = Menu(app)
+        app.config(menu=menuBar)
+    else:
+        print("Cardio Vascular Disease Predicted")
+        label_file_explorer.configure(text="Result for the patient data: Cardio Vascular disease detected")
+        app.title("Cardio Vascular Disease Prediction system")
+        ttk.Label(app, text="Result for the patient data: Cardio Vascular disease detected").grid(column=0,row=0,padx=20,pady=30)
+        menuBar = Menu(app)
+        app.config(menu=menuBar)
+    
+        
+if __name__ == '__main__':
+    window = Tk()
+  
+    # Set window title
+    window.title('Cardio Vascular Disease Prediction system')
+      
+    # Set window size
+    window.geometry("700x400")
+      
+    #Set window background color
+    window.config(background = "white")
+      
+    # Create a File Explorer label
+    label_file_explorer = Label(window,
+                                text = "Please give Input dataset",
+                                width = 100, height = 4,
+                                fg = "blue")
+         
+    button_explore = Button(window,
+                            text = "Browse patient data Files",
+                            command = browseFiles)
+    button_exit = Button(window,
+                         text = "exit",
+                         command = exit)  
+    button_start = Button(window,
+                         text = "Start Analyzing Data",
+                         command = start)
+
+       
+    # Grid method is chosen for placing
+    # the widgets at respective positions
+    # in a table like structure by
+    # specifying rows and columns
+    label_file_explorer.grid(column = 1, row = 1, padx=5, pady=5)
+    button_explore.grid(column = 1, row = 3, padx=5, pady=5)
+    button_exit.grid(column = 1,row = 9, padx=5, pady=5)
+    button_start.grid(column = 1,row = 12, padx=5, pady=5)
+      
+    # Let the window wait for any events
+    
+    
+    window.mainloop()
+
+
+    
+
